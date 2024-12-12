@@ -19,4 +19,9 @@ public class JobMarketController {
 	public ResponseEntity<String> getResponse(@RequestParam String prompt) {
 		return ResponseEntity.ok(service.getResponse(prompt));
 	}
+
+	@GetMapping("/")
+	public String HealthCheck(){
+		return "Application is up and running";
+	}
 }

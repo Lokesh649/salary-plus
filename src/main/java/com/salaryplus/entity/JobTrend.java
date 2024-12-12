@@ -19,11 +19,10 @@ public class JobTrend {
 	 	@Id
 	    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	    private Long id;
-
 	    private String role;
 	    private String company;
 	    private String location;
-	    private int experience;
+	    private String experience;
 	    private String skills;
 	    // Scale of demand (e.g., 1-10)
 	

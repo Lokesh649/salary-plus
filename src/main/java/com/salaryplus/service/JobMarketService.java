@@ -2,11 +2,16 @@ package com.salaryplus.service;
 
 import java.util.List;
 
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.salaryplus.dto.Contents;
+import com.salaryplus.dto.PartClass;
+import com.salaryplus.dto.TextClass;
 import com.salaryplus.entity.JobTrend;
 import com.salaryplus.entity.PositionTrend;
 import com.salaryplus.repository.JobTrendRepository;
@@ -44,10 +49,16 @@ public class JobMarketService {
 			log.info("position data size:-" + positionData.size());
 			List<JobTrend> jobData = jobRepo.findAll();
 
-			GeminiRequest request = new GeminiRequest();
-			request.setPrompt(prompt);
+			// GeminiRequest request = new GeminiRequest();
+			// request.setPrompt(prompt);
 
-			request.setDatasets(List.of(positionData, jobData));
+			// request.setDatasets(List.of(positionData, jobData));
+TextClass text = new TextClass();
+text.setText(prompt+":use provided data"+positionData+" "+jobData);
+PartClass part = new PartClass();
+part.setParts(List.of(text));
+			Contents request = new Contents();
+			request.setContents(List.of(part));
 
 			Gson gson = new Gson();
 			String requestJson = gson.toJson(request);
@@ -64,7 +75,7 @@ public class JobMarketService {
 			// Make the API call using RestTemplate
 			ResponseEntity<String> responseEntity = restTemplate.exchange(GEMINI_API_ENDPOINT + API_KEY,
 					HttpMethod.POST, entity, String.class);
-
+JSONObject resp = new JSONObject(responseEntity.getBody());
 			// Parse the response from Gemini API
 			response = responseEntity.getBody();
 		} catch (Exception e) {
