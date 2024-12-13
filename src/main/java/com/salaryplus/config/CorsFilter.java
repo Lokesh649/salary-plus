@@ -27,10 +27,8 @@ public class CorsFilter implements Filter {
             throws IOException, ServletException {
         if (response instanceof HttpServletResponse) {
             HttpServletResponse httpResponse = (HttpServletResponse) response;
-            httpResponse.setHeader("Access-Control-Allow-Origin", "https://salary-plus-444504.web.app"); 
-            httpResponse.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-            httpResponse.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-            httpResponse.setHeader("Access-Control-Allow-Credentials", "true");
+            httpResponse.setHeader("Access-Control-Allow-Origin", "*"); 
+        
         }
 
         if (request instanceof HttpServletRequest) {

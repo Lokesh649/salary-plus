@@ -13,7 +13,6 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.salaryplus.dto.Contents;
 import com.salaryplus.dto.PartClass;
 import com.salaryplus.dto.TextClass;
@@ -21,7 +20,6 @@ import com.salaryplus.entity.JobTrend;
 import com.salaryplus.entity.PositionTrend;
 import com.salaryplus.repository.JobTrendRepository;
 import com.salaryplus.repository.PositionTrendRepository;
-import com.salaryplus.utility.GeminiRequest;
 
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
@@ -59,29 +57,24 @@ public class JobMarketService {
 			log.info("position data size:-" + positionData.size());
 			List<JobTrend> jobData = (List<JobTrend>)datsets.get(0);
 
-TextClass text = new TextClass();
-text.setText(prompt+":use provided data"+positionData+" "+jobData);
-PartClass part = new PartClass();
-part.setParts(List.of(text));
+		TextClass text = new TextClass();
+		text.setText(prompt+":use general info on internet and provided data"+positionData+" "+jobData);
+		PartClass part = new PartClass();
+		part.setParts(List.of(text));
 			Contents request = new Contents();
 			request.setContents(List.of(part));
-
 			Gson gson = new Gson();
 			String requestJson = gson.toJson(request);
 
-			// Set up the request headers
 			HttpHeaders httpHeaders = new HttpHeaders();
 			httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-			// httpHeaders.set("Authorization", "Bearer " + API_KEY); // Use Bearer token
-			// for authentication
-
-			// Create the request entity
+			
 			HttpEntity<String> entity = new HttpEntity<>(requestJson, httpHeaders);
 
-			// Make the API call using RestTemplate
+			
 			ResponseEntity<String> responseEntity = restTemplate.exchange(GEMINI_API_ENDPOINT + API_KEY,
 					HttpMethod.POST, entity, String.class);
-JSONObject resp = new JSONObject(responseEntity.getBody());
+			JSONObject resp = new JSONObject(responseEntity.getBody());
 			// Parse the response from Gemini API
 			response = responseEntity.getBody();
 		} catch (Exception e) {
@@ -93,18 +86,16 @@ JSONObject resp = new JSONObject(responseEntity.getBody());
             // Parse the JSON string
             JsonNode rootNode = objectMapper.readTree(response);
 
-            // Navigate to the "text" key
+           
             JsonNode textNode = rootNode
-                .path("candidates") // Navigate to "candidates"
-                .get(0) // Get the first element of the array
-                .path("content") // Navigate to "content"
-                .path("parts") // Navigate to "parts"
-                .get(0) // Get the first element of the array
-                .path("text"); // Get the "text" key
+                .path("candidates") 
+                .get(0) 
+                .path("content") 
+                .path("parts") 
+                .get(0)
+                .path("text"); 
 
-            // Extract and print the value
             if (!textNode.isMissingNode()) {
-                // String textValue = textNode.asText().replace("`", "");
 				 response = textNode.asText();
 			}
 
@@ -114,7 +105,7 @@ JSONObject resp = new JSONObject(responseEntity.getBody());
 
 	public List<Object> getandExecuteQuery(String prompt) {
         List<Object> dataSets = new ArrayList<>();
-        //interact with gemini and get queries as stringarray
+        
 		StringBuilder query =  new StringBuilder();
 		query.append(":I have two tables: jobtrend (with columns: id, role, company, location, experience, skills) and positiontrend (with columns: id, position, gender, location, education, experience, salary). Please provide two SQL queries that use SELECT * and filter the results using a WHERE clause. The filter criteria should be based on a prompt (the text before a colon). For example, if the prompt is 'Role: Software Engineer', the query should filter the jobtrend table to only include rows where the role column contains 'Software Engineer'. Please provide the queries as a string array, without any additional explanation.");
         
@@ -128,16 +119,13 @@ JSONObject resp = new JSONObject(responseEntity.getBody());
 					Gson gson = new Gson();
 					String requestJson = gson.toJson(request);
 		
-					// Set up the request headers
+					
 					HttpHeaders httpHeaders = new HttpHeaders();
 					httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-					// httpHeaders.set("Authorization", "Bearer " + API_KEY); // Use Bearer token
-					// for authentication
-		
-					// Create the request entity
+					
 					HttpEntity<String> entity = new HttpEntity<>(requestJson, httpHeaders);
 		
-					// Make the API call using RestTemplate
+					
 					ResponseEntity<String> responseEntity = restTemplate.exchange(GEMINI_API_ENDPOINT + API_KEY,
 							HttpMethod.POST, entity, String.class);
 
@@ -155,24 +143,24 @@ JSONObject resp = new JSONObject(responseEntity.getBody());
 
 	public String[] queries(String result){
 		try {
-            // Create an ObjectMapper instance
+            
             ObjectMapper objectMapper = new ObjectMapper();
 
-            // Parse the JSON string
+           
             JsonNode rootNode = objectMapper.readTree(result);
 
-            // Navigate to the "text" key
+           
             JsonNode textNode = rootNode
-                .path("candidates") // Navigate to "candidates"
-                .get(0) // Get the first element of the array
-                .path("content") // Navigate to "content"
-                .path("parts") // Navigate to "parts"
-                .get(0) // Get the first element of the array
-                .path("text"); // Get the "text" key
+                .path("candidates") 
+                .get(0) 
+                .path("content")
+                .path("parts") 
+                .get(0) 
+                .path("text"); 
 
-            // Extract and print the value
+           
             if (!textNode.isMissingNode()) {
-                // String textValue = textNode.asText().replace("`", "");
+               
 				String textValue = textNode.asText().replace("`", "").replace("sql", "").replace("json", "");
 				String[] stringArray = objectMapper.readValue(textValue, String[].class);          
                 log.info("Extracted Text: " + stringArray);
